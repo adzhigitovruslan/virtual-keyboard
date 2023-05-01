@@ -154,7 +154,7 @@ export class Keyboard {
 
   displayKeyboard(language) {
     this.switch = language === "eng" ? eventCodeEng : language === "ru" ? eventCodeRu : undefined;
-
+    
     for (let key in this.switch) {
       if (typeof this.switch[key] === "object") {
         const button = new Button({

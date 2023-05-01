@@ -2,7 +2,7 @@ import { Keyboard } from "./modules/keyboard.js";
 import { Textarea } from "./modules/textarea.js";
 
 let keyPressed = {};
-let language = "eng";
+let language = localStorage.getItem("lang") ? localStorage.getItem("lang") : "eng";
 
 const keyboard = new Keyboard({
   mainClass: "main",
@@ -21,12 +21,10 @@ keyboard.shiftLetters(language);
 function keydownFunc(event) {
   keyPressed[event.code] = true;
   if (keyPressed["ShiftLeft"] && keyPressed["AltLeft"]) {
-    console.log(keyPressed);
     language = language === "eng" ? "ru" : "eng";
-    console.log(language, "first");
+    localStorage.setItem("lang", language);
     keyboard.toClearScreen();
     keyboard.displayKeyboard(language);
-    console.log(language);
   }
 }
 
