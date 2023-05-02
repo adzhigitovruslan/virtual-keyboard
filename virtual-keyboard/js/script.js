@@ -1,14 +1,17 @@
 import { Keyboard } from "./modules/keyboard.js";
 import { Textarea } from "./modules/textarea.js";
 
-localStorage.setItem("lang", true);
-
-let language = JSON.parse(localStorage.getItem("lang"));
+let localLanguage;
+if(localStorage.getItem("language")) {
+  localLanguage = JSON.parse(localStorage.getItem("language"));
+} else {
+  localStorage.setItem("language", true);
+}
 
 const keyboard = new Keyboard({
   mainClass: "main",
   wrapperClass: "keyboard",
-  language,
+  language: localLanguage,
 });
 
 const textarea = new Textarea({
@@ -20,7 +23,6 @@ keyboard.displayKeyboard();
 textarea.displayTextarea();
 
 document.addEventListener("keydown", (event) => {
-
   keyboard.shiftLeftPress(event.code);
   keyboard.shortcutPress(event);
   keyboard.hangClass(event.code);

@@ -156,8 +156,8 @@ export class Keyboard {
     main.appendChild(keyboardWrapper);
   }
 
-  displayKeyboard(lang) {
-    switchLang = lang ? eventCodeEng : eventCodeRu;
+  displayKeyboard() {
+    switchLang = this.language ? eventCodeEng : eventCodeRu;
     for (let key in switchLang) {
       if (typeof switchLang[key] === "object") {
         const button = new Button({
