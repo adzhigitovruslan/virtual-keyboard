@@ -235,6 +235,10 @@ h6 {
   cursor: pointer;
 }
 
+.row__key .icon-navigation-arrow {
+  pointer-events: none;
+}
+
 .row__key .icon-navigation-arrow.arrow-up {
   -webkit-transform: rotate(-90deg);
       -ms-transform: rotate(-90deg);
