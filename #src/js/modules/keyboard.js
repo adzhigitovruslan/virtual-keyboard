@@ -136,12 +136,12 @@ const eventCodeRu = {
 let textAreaText = "";
 let content = "";
 let switchLang = eventCodeEng;
-let language = JSON.parse(localStorage.getItem("lang")) || false;
 
 export class Keyboard {
   constructor(options) {
     this.mainClass = options.mainClass;
     this.wrapperClass = options.wrapperClass;
+    this.language = options.language;
   }
 
   createKeyboard() {
@@ -156,9 +156,7 @@ export class Keyboard {
     main.appendChild(keyboardWrapper);
   }
 
-  displayKeyboard() {
-    let lang = JSON.parse(localStorage.getItem("lang"));
-    console.log(lang);
+  displayKeyboard(lang) {
     switchLang = lang ? eventCodeEng : eventCodeRu;
     for (let key in switchLang) {
       if (typeof switchLang[key] === "object") {
@@ -263,20 +261,22 @@ export class Keyboard {
   }
 
   shortcutPress(event) {
-    if (event.ctrlKey && event.altKey) {
+    if ((event.ctrlKey) && (event.altKey)) {
       this.toClearScreen();
-      this.displayKeyboard();
+      this.switchLanguage();
     }
   }
 
   switchLanguage() {
-    language = !language;
+    this.language = !this.language;
+    localStorage.setItem("language", this.language);
+    this.displayKeyboard(this.language);
   }
 
 
   displayText(event) {
     const keys = document.querySelectorAll(".row__key");
-    
+
     switch (event.code) {
     case "Backspace":
       textAreaText.slice(0, -1);
@@ -291,17 +291,14 @@ export class Keyboard {
       textAreaText = "\n";
       break;
     case "ShiftLeft":
-      if (event.shiftKey && event.altKey) {
-        this.shortcutPress(event);
-      }
       textAreaText = "";
       break;
     case "ShiftRight":
       textAreaText = "";
       break;
     case "ControlLeft":
-      if (event.shiftKey && event.altKey) {
-        this.shortcutPress(event);
+      if(event.ctrlKey) {
+        console.log("ctrl");
       }
       textAreaText = "";
       break;
