@@ -1,12 +1,17 @@
 import { Keyboard } from "./modules/keyboard.js";
 import { Textarea } from "./modules/textarea.js";
 
-let keyPressed = {};
-let language = localStorage.getItem("lang") ? localStorage.getItem("lang") : "eng";
+let localLanguage;
+if (localStorage.getItem("language")) {
+  localLanguage = JSON.parse(localStorage.getItem("language"));
+} else {
+  localStorage.setItem("language", true);
+}
 
 const keyboard = new Keyboard({
   mainClass: "main",
   wrapperClass: "keyboard",
+  language: localLanguage,
 });
 
 const textarea = new Textarea({
@@ -14,26 +19,24 @@ const textarea = new Textarea({
 });
 
 keyboard.createKeyboard();
-keyboard.displayKeyboard(language);
+keyboard.displayKeyboard();
 textarea.displayTextarea();
-keyboard.shiftLetters(language);
 
-function keydownFunc(event) {
-  keyPressed[event.code] = true;
-  if (keyPressed["ShiftLeft"] && keyPressed["AltLeft"]) {
-    language = language === "eng" ? "ru" : "eng";
-    localStorage.setItem("lang", language);
-    keyboard.toClearScreen();
-    keyboard.displayKeyboard(language);
+document.addEventListener("keydown", (event) => {
+  keyboard.shiftLeftPress(event.code);
+  keyboard.shortcutPress(event);
+  keyboard.hangClass(event.code);
+  keyboard.displayText(event);
+});
+document.addEventListener("keyup", (event) => {
+  keyboard.shiftLeftUnpress(event.code);
+  keyboard.removeClass(event.code);
+});
+document.addEventListener("click", (event) => {
+  if (event.target.classList.contains("row__key")) {
+    event.target.classList.add("active");
+    setTimeout(() => {
+      event.target.classList.remove("active");
+    }, 500);
   }
-}
-
-const keyupFunc = (event) => {
-  delete keyPressed[event.code];
-};
-
-document.addEventListener("keydown", keydownFunc);
-document.addEventListener("keyup", keyupFunc);
-
-window.removeEventListener("beforeunload", keydownFunc);
-window.removeEventListener("beforeunload", keyupFunc);
+});

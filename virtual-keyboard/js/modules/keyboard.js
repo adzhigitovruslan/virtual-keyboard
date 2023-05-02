@@ -14,8 +14,8 @@ const eventCodeEng = {
   "Digit0": { 0: ")" },
   "Minus": { "-": "_" },
   "Equal": { "=": "+" },
-  "Backspace": "Backspace",
-  "Tab": "Tab",
+  "Backspace": "⌫",
+  "Tab": "⇥",
   "KeyQ": { "q": "Q" },
   "KeyW": { "w": "W" },
   "KeyE": { "e": "E" },
@@ -29,7 +29,7 @@ const eventCodeEng = {
   "BracketLeft": { "[": "{" },
   "BracketRight": { "]": "}" },
   "Delete": "Del",
-  "CapsLock": "Capslock",
+  "CapsLock": "⇪",
   "KeyA": { "a": "A" },
   "KeyS": { "s": "S" },
   "KeyD": { "d": "D" },
@@ -42,8 +42,8 @@ const eventCodeEng = {
   "Semicolon": { ";": ":" },
   "Quote": { "'": "\"" },
   "Backslash": { "\\": "|" },
-  "Enter": "Enter",
-  "ShiftLeft": "Shift",
+  "Enter": "↩",
+  "ShiftLeft": "⇧",
   "KeyZ": { "z": "Z" },
   "KeyX": { "x": "X" },
   "KeyC": { "c": "C" },
@@ -55,13 +55,13 @@ const eventCodeEng = {
   "Period": { ".": ">" },
   "Slash": { "/": "?" },
   "ArrowUp": "",
-  "ShiftRight": "Shift",
-  "ControlLeft": "Control",
-  "AltLeft": "Alt",
-  "MetaLeft": "Meta",
-  "Space": "space",
-  "MetaRight": "Meta",
-  "AltRight": "Alt",
+  "ShiftRight": "⇧",
+  "ControlLeft": "⌃",
+  "AltLeft": "⌥",
+  "MetaLeft": "⌘",
+  "Space": "",
+  "MetaRight": "⌘",
+  "AltRight": "⌥",
   "ArrowLeft": "",
   "ArrowDown": "",
   "ArrowRight": "",
@@ -80,8 +80,8 @@ const eventCodeRu = {
   "Digit0": { 0: ")" },
   "Minus": { "-": "_" },
   "Equal": { "=": "+" },
-  "Backspace": "Backspace",
-  "Tab": "Tab",
+  "Backspace": "⌫",
+  "Tab": "⇥",
   "KeyQ": { "й": "Й" },
   "KeyW": { "ц": "Ц" },
   "KeyE": { "у": "У" },
@@ -95,7 +95,7 @@ const eventCodeRu = {
   "BracketLeft": { "х": "Х" },
   "BracketRight": { "ъ": "Ъ" },
   "Delete": "Del",
-  "CapsLock": "Capslock",
+  "CapsLock": "⇪",
   "KeyA": { "ф": "Ф" },
   "KeyS": { "ы": "Ы" },
   "KeyD": { "в": "В" },
@@ -108,8 +108,8 @@ const eventCodeRu = {
   "Semicolon": { "ж": "Ж" },
   "Quote": { "э": "Э" },
   "Backslash": { "ё": "Ё" },
-  "Enter": "Enter",
-  "ShiftLeft": "Shift",
+  "Enter": "↩",
+  "ShiftLeft": "⇧",
   "KeyZ": { "я": "Я" },
   "KeyX": { "ч": "Ч" },
   "KeyC": { "с": "С" },
@@ -121,23 +121,27 @@ const eventCodeRu = {
   "Period": { "ю": "Ю" },
   "Slash": { "/": "?" },
   "ArrowUp": "",
-  "ShiftRight": "Shift",
-  "ControlLeft": "Control",
-  "AltLeft": "Alt",
-  "MetaLeft": "Meta",
-  "Space": "space",
-  "MetaRight": "Meta",
-  "AltRight": "Alt",
+  "ShiftRight": "⇧",
+  "ControlLeft": "⌃",
+  "AltLeft": "⌥",
+  "MetaLeft": "⌘",
+  "Space": "",
+  "MetaRight": "⌘",
+  "AltRight": "⌥",
   "ArrowLeft": "",
   "ArrowDown": "",
   "ArrowRight": "",
 };
 
+let textAreaText = "";
+let content = "";
+let switchLang = eventCodeEng;
+
 export class Keyboard {
   constructor(options) {
     this.mainClass = options.mainClass;
     this.wrapperClass = options.wrapperClass;
-    this.switch = options.language;
+    this.language = options.language;
   }
 
   createKeyboard() {
@@ -152,24 +156,23 @@ export class Keyboard {
     main.appendChild(keyboardWrapper);
   }
 
-  displayKeyboard(language) {
-    this.switch = language === "eng" ? eventCodeEng : language === "ru" ? eventCodeRu : undefined;
-    
-    for (let key in this.switch) {
-      if (typeof this.switch[key] === "object") {
+  displayKeyboard() {
+    switchLang = this.language ? eventCodeEng : eventCodeRu;
+    for (let key in switchLang) {
+      if (typeof switchLang[key] === "object") {
         const button = new Button({
           eventCode: key,
           className: "row__key",
-          innerText: Object.keys(this.switch[key]),
+          innerText: Object.keys(switchLang[key]),
         });
         document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
 
-      } else if (typeof this.switch[key] !== "object") {
+      } else if (typeof switchLang[key] !== "object") {
 
         const button = new Button({
           eventCode: key,
           className: "row__key",
-          innerText: this.switch[key],
+          innerText: switchLang[key],
         });
 
         document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
@@ -177,67 +180,153 @@ export class Keyboard {
     }
   }
 
-  shiftLetters() {
-    document.addEventListener("keydown", (event) => {
-
-      if (event.code === "ShiftLeft") {
-        this.toClearScreen();
-
-        for (let key in this.switch) {
-
-          if (typeof this.switch[key] === "object") {
-
-            const button = new Button({
-              eventCode: key,
-              className: "row__key",
-              innerText: Object.values(this.switch[key]),
-            });
-
-            document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-          } else if (typeof this.switch[key] !== "object") {
-
-            const button = new Button({
-              eventCode: key,
-              className: "row__key",
-              innerText: this.switch[key],
-            });
-
-            document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-          }
-        }
-      }
-    });
-    document.addEventListener("keyup", (event) => {
-      if (event.code === "ShiftLeft") {
-        
-        this.toClearScreen();
-
-        for (let key in this.switch) {
-
-          if (typeof this.switch[key] === "object") {
-            const button = new Button({
-              eventCode: key,
-              className: "row__key",
-              innerText: Object.keys(this.switch[key]),
-            });
-            document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-
-          } else if (typeof this.switch[key] !== "object") {
-
-            const button = new Button({
-              eventCode: key,
-              className: "row__key",
-              innerText: this.switch[key],
-            });
-
-            document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-          }
-        }
+  hangClass(eventCode) {
+    const allkeys = document.querySelectorAll(".row__key");
+    allkeys.forEach((element) => {
+      if (eventCode === element.dataset.eventCode) {
+        element.classList.add("active");
       }
     });
   }
 
+  removeClass(eventCode) {
+    const allkeys = document.querySelectorAll(".row__key");
+    allkeys.forEach((element) => {
+      if (eventCode === element.dataset.eventCode) {
+        element.classList.remove("active");
+      }
+    });
+  }
+
+  shiftLeftPress(eventCode) {
+    if (eventCode === "ShiftLeft") {
+      this.toClearScreen();
+      for (let key in switchLang) {
+
+        if (typeof switchLang[key] === "object") {
+
+          const button = new Button({
+            eventCode: key,
+            className: "row__key",
+            innerText: Object.values(switchLang[key]),
+          });
+
+          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
+        } else if (typeof switchLang[key] !== "object") {
+
+          const button = new Button({
+            eventCode: key,
+            className: "row__key",
+            innerText: switchLang[key],
+          });
+
+          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
+
+        }
+      }
+    }
+  }
+
+  shiftLeftUnpress(eventCode) {
+    if (eventCode === "ShiftLeft") {
+
+      this.toClearScreen();
+
+      for (let key in switchLang) {
+
+        if (typeof switchLang[key] === "object") {
+          const button = new Button({
+            eventCode: key,
+            className: "row__key",
+            innerText: Object.keys(switchLang[key]),
+          });
+          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
+
+        } else if (typeof switchLang[key] !== "object") {
+
+          const button = new Button({
+            eventCode: key,
+            className: "row__key",
+            innerText: switchLang[key],
+          });
+
+          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
+        }
+      }
+    }
+  }
+
   toClearScreen() {
     document.querySelector(`.${this.wrapperClass}`).innerHTML = "";
+  }
+
+  shortcutPress(event) {
+    if ((event.ctrlKey) && (event.altKey)) {
+      this.toClearScreen();
+      this.switchLanguage();
+    }
+  }
+
+  switchLanguage() {
+    this.language = !this.language;
+    localStorage.setItem("language", this.language);
+    this.displayKeyboard(this.language);
+  }
+
+
+  displayText(event) {
+    const keys = document.querySelectorAll(".row__key");
+
+    switch (event.code) {
+    case "Backspace":
+      textAreaText.slice(0, -1);
+      break;
+    case "Tab":
+      textAreaText = "";
+      break;
+    case "CapsLock":
+      textAreaText = "";
+      break;
+    case "Enter":
+      textAreaText = "\n";
+      break;
+    case "ShiftLeft":
+      textAreaText = "";
+      break;
+    case "ShiftRight":
+      textAreaText = "";
+      break;
+    case "ControlLeft":
+      if(event.ctrlKey) {
+        console.log("ctrl");
+      }
+      textAreaText = "";
+      break;
+    case "AltLeft":
+      textAreaText = "";
+      break;
+    case "MetaLeft":
+      textAreaText = "";
+      break;
+    case "AltRight":
+      textAreaText = "";
+      break;
+    case "MetaRight":
+      textAreaText = "";
+      break;
+    case "Space":
+      textAreaText = " ";
+      break;
+    default:
+      for (let i = 0; i < keys.length; i++) {
+        if (event.code === keys[i].dataset.eventCode) {
+          textAreaText = keys[i].innerText;
+        }
+      }
+      break;
+    }
+
+    content += textAreaText;
+    document.querySelector(".textarea").innerText = content;
   }
 }

@@ -86,6 +86,44 @@ h6 {
   font-weight: 400;
 }
 
+@font-face {
+  font-family: "icomoon";
+  font-display: swap;
+  src: url(../fonts/icomoon.woff) format("woff"), url("../fonts/icomoon.woff2#icons") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^=icon-]::before,
+[class*=icon-]::before {
+  font-family: "icomoon";
+  font-weight: normal;
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[class^=icon-]::before,
+[class*=icon-]::before {
+  display: block;
+}
+
+.icon-navigation-arrow:before {
+  content: "\ea1c";
+}
+
+@font-face {
+  font-family: "icomoon";
+  font-display: swap;
+  src: url("../fonts/icomoon.woff") format("woff"), url("../fonts/icomoon.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
 :root {
   --gap: 15px;
   --key-width: 50px;
@@ -197,13 +235,31 @@ h6 {
   cursor: pointer;
 }
 
+.row__key .icon-navigation-arrow.arrow-up {
+  -webkit-transform: rotate(-90deg);
+      -ms-transform: rotate(-90deg);
+          transform: rotate(-90deg);
+}
+
+.row__key .icon-navigation-arrow.arrow-down {
+  -webkit-transform: rotate(90deg);
+      -ms-transform: rotate(90deg);
+          transform: rotate(90deg);
+}
+
+.row__key .icon-navigation-arrow.arrow-left {
+  -webkit-transform: rotate(180deg);
+      -ms-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+
 .row__key:hover {
   -webkit-transform: translate3D(0, 0, 35px);
       -ms-transform: translate3D(0, 0, 35px);
           transform: translate3D(0, 0, 35px);
 }
 
-.row__key:active,
+.row__key.active,
 .row__key[data-selected]:not([data-selected=false]) {
   -webkit-transform: translate3D(0, 0, 25px);
       -ms-transform: translate3D(0, 0, 25px);
@@ -345,6 +401,11 @@ h6 {
   -webkit-transform: rotate(270deg);
       -ms-transform: rotate(270deg);
           transform: rotate(270deg);
+}
+
+.system-description {
+  color: #fff;
+  margin-bottom: 10px;
 }
 @supports (-webkit-appearance:none){
 
