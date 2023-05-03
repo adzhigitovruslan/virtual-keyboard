@@ -133,7 +133,7 @@ const eventCodeRu = {
   "ArrowRight": "",
 };
 
-let textAreaText = "";
+let newValue = "";
 let content = "";
 let switchLang = eventCodeEng;
 
@@ -220,14 +220,14 @@ export class Keyboard {
       if (lang) {
         if (key.includes("Key")) continue;
         for (let i = 0; i < keys.length; i++) {
-          if(keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+          if (keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
             keys[i].innerText = Object.values(obj[key]);
           }
         }
       } else {
         if (key.includes("Key")) continue;
         for (let i = 0; i < keys.length; i++) {
-          if(keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+          if (keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
             keys[i].innerText = Object.values(obj[key]);
           }
         }
@@ -245,14 +245,14 @@ export class Keyboard {
       if (lang) {
         if (key.includes("Key")) continue;
         for (let i = 0; i < keys.length; i++) {
-          if(keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+          if (keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
             keys[i].innerText = Object.keys(obj[key]);
           }
         }
       } else {
         if (key.includes("Key")) continue;
         for (let i = 0; i < keys.length; i++) {
-          if(keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+          if (keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
             keys[i].innerText = Object.keys(obj[key]);
           }
         }
@@ -316,77 +316,111 @@ export class Keyboard {
   displayText(event) {
     const keys = document.querySelectorAll(".row__key");
     const textarea = document.querySelector(".textarea");
-    
+
     switch (event.code || event.target.dataset.eventCode) {
     case "Backspace":
-      content = content.slice(0, -1);
-      console.log(typeof content);
+      newValue = "";
+      this.toBackspace(textarea);
       break;
     case "Tab":
-      textAreaText = " ";
+      newValue = " ";
       break;
     case "CapsLock":
-      textAreaText = "";
+      newValue = "";
       break;
     case "Enter":
-      textAreaText = "\n";
+      newValue = "\n";
       break;
     case "ShiftLeft":
-      textAreaText = "";
+      newValue = "";
       break;
     case "ShiftRight":
-      textAreaText = "";
+      newValue = "";
       break;
     case "ControlLeft":
-      textAreaText = "";
+      newValue = "";
       break;
     case "AltLeft":
-      textAreaText = "";
+      newValue = "";
       break;
     case "MetaLeft":
-      textAreaText = "";
+      newValue = "";
       break;
     case "AltRight":
-      textAreaText = "";
+      newValue = "";
       break;
     case "MetaRight":
-      textAreaText = "";
+      newValue = "";
       break;
     case "Space":
-      textAreaText = " ";
+      newValue = " ";
+      break;
+    case "Delete":
+      this.toDel(textarea);
+      newValue = "";
       break;
     case "ArrowLeft":
-      textAreaText = "←";
+      newValue = "←";
       break;
     case "ArrowRight":
-      textAreaText = "→";
+      newValue = "→";
       break;
     case "ArrowDown":
-      textAreaText = "↓";
+      newValue = "↓";
       break;
     case "ArrowUp":
-      textAreaText = "↑";
+      newValue = "↑";
       break;
     default:
       for (let i = 0; i < keys.length; i++) {
         if (event.code === keys[i].dataset.eventCode || event.target.dataset.eventCode === keys[i].dataset.eventCode) {
-          textAreaText = keys[i].innerText;
+          newValue = keys[i].innerText;
         }
       }
       break;
     }
+    this.insertNewText(textarea, newValue);
+    newValue = "";
+  }
 
-    content += textAreaText;
-    textAreaText = "";
+  insertNewText(textarea, newValue) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const after = text.substring(end, text.length);
+    textarea.value = (before + newValue + after);
+    textarea.selectionStart = textarea.selectionEnd = start + newValue.length;
+    textarea.focus();
+  }
 
-    textarea.value = content;
-    console.log(textarea.value);
+  toBackspace(textarea) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const before = text.substring(0, start - 1);
+    const after = text.substring(end, text.length);
 
-    var start = textarea.selectionStart;
-    var end = textarea.selectionEnd;
-    var selection = textarea.selection;
-    console.log("selectionStart: " + start 
-          + "\nselectionEnd :" + end
-          + "\nselection: " + selection);
+    if (start === 0 && start === end) return;
+    if (start !== 0) {
+      textarea.value = before + after;
+      textarea.selectionStart = textarea.selectionEnd = start - 1;
+      textarea.focus();
+    }
+  }
+
+  toDel(textarea) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const after = text.substring(end + 1, text.length);
+
+    if (start === text.length && start === end) return;
+    if (start !== text.length) {
+      textarea.value = before + after;
+      textarea.selectionStart = textarea.selectionEnd = start;
+      textarea.focus();
+    }
   }
 }
