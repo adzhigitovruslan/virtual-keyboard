@@ -199,41 +199,63 @@ export class Keyboard {
     });
   }
 
-  switchCaps(value, lang) {
+  switchCaps(value) {
+    let lang = JSON.parse(localStorage.getItem("language")) || false;
     this.isCapsOn = !this.isCapsOn;
     localStorage.setItem("isCapsOn", value);
-    if(value) {
+    if (value) {
       this.toUpperCase(lang);
     } else {
       this.toLowerCase(lang);
     }
   }
 
-  shiftLeftPress(event, activeClass) {
-    this.toClearScreen();
-    for (let key in switchLang) {
+  shiftLeftPress() {
+    let lang = JSON.parse(localStorage.getItem("language")) || false;
+    this.toUpperCase(lang);
+    let obj = lang ? eventCodeEng : eventCodeRu;
 
-      if (typeof switchLang[key] === "object") {
+    const keys = document.querySelectorAll(".row__key");
+    for (let key in obj) {
+      if (lang) {
+        if (key.includes("Key")) continue;
+        for (let i = 0; i < keys.length; i++) {
+          if(keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+            keys[i].innerText = Object.values(obj[key]);
+          }
+        }
+      } else {
+        if (key.includes("Key")) continue;
+        for (let i = 0; i < keys.length; i++) {
+          if(keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+            keys[i].innerText = Object.values(obj[key]);
+          }
+        }
+      }
+    }
+  }
 
-        const button = new Button({
-          eventCode: key,
-          className: "row__key",
-          activeClass,
-          innerText: Object.values(switchLang[key]),
-        });
+  shiftLeftUnpress() {
+    let lang = JSON.parse(localStorage.getItem("language")) || false;
+    this.toLowerCase(lang);
+    let obj = lang ? eventCodeEng : eventCodeRu;
 
-        document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-      } else if (typeof switchLang[key] !== "object") {
-
-        const button = new Button({
-          eventCode: key,
-          className: "row__key",
-          activeClass,
-          innerText: switchLang[key],
-        });
-
-        document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-
+    const keys = document.querySelectorAll(".row__key");
+    for (let key in obj) {
+      if (lang) {
+        if (key.includes("Key")) continue;
+        for (let i = 0; i < keys.length; i++) {
+          if(keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+            keys[i].innerText = Object.keys(obj[key]);
+          }
+        }
+      } else {
+        if (key.includes("Key")) continue;
+        for (let i = 0; i < keys.length; i++) {
+          if(keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+            keys[i].innerText = Object.keys(obj[key]);
+          }
+        }
       }
     }
   }
@@ -271,60 +293,6 @@ export class Keyboard {
           el.innerText = el.innerText.toLowerCase();
         }
       });
-    }
-  }
-
-  shiftLeftUnpress(value) {
-    if (value === "ShiftLeft" || !value) {
-
-      this.toClearScreen();
-
-      for (let key in switchLang) {
-
-        if (typeof switchLang[key] === "object") {
-          const button = new Button({
-            eventCode: key,
-            className: "row__key",
-            innerText: Object.keys(switchLang[key]),
-          });
-          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-
-        } else if (typeof switchLang[key] !== "object") {
-
-          const button = new Button({
-            eventCode: key,
-            className: "row__key",
-            innerText: switchLang[key],
-          });
-
-          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-        }
-      }
-    } else {
-      this.toClearScreen();
-      for (let key in switchLang) {
-
-        if (typeof switchLang[key] === "object") {
-
-          const button = new Button({
-            eventCode: key,
-            className: "row__key",
-            innerText: Object.values(switchLang[key]),
-          });
-
-          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-        } else if (typeof switchLang[key] !== "object") {
-
-          const button = new Button({
-            eventCode: key,
-            className: "row__key",
-            innerText: switchLang[key],
-          });
-
-          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-
-        }
-      }
     }
   }
 

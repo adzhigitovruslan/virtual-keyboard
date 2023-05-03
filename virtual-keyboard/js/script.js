@@ -16,23 +16,23 @@ textarea.displayTextarea();
 
 document.addEventListener("keydown", (event) => {
   event.preventDefault();
-  let lang = JSON.parse(localStorage.getItem("language")) || false;
+  
   if (event.code === "ShiftLeft") {
-    keyboard.shiftLeftPress(event, "active");
+    keyboard.shiftLeftPress();
   }
   if (event.getModifierState("CapsLock")) {
-    keyboard.switchCaps(true, lang);
+    keyboard.switchCaps(true);
   } 
   keyboard.shortcutPress(event);
   keyboard.hangClass(event);
   keyboard.displayText(event);
 });
 document.addEventListener("keyup", (event) => {
-  if (event.code === "ShiftLeft") {
-    keyboard.shiftLeftUnpress(event.code);
-  }
-  if(!event.getModifierState("CapsLock")) {
+  if(!event.getModifierState("CapsLock") && event.code === "CapsLock") {
     keyboard.switchCaps(false);
+  }
+  if(event.code === "ShiftLeft") {
+    keyboard.shiftLeftUnpress();
   }
   keyboard.removeClass(event.code);
 });
