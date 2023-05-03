@@ -315,9 +315,12 @@ export class Keyboard {
 
   displayText(event) {
     const keys = document.querySelectorAll(".row__key");
+    const textarea = document.querySelector(".textarea");
+    
     switch (event.code || event.target.dataset.eventCode) {
     case "Backspace":
-      textAreaText.slice(0, -1);
+      content = content.slice(0, -1);
+      console.log(typeof content);
       break;
     case "Tab":
       textAreaText = " ";
@@ -374,7 +377,16 @@ export class Keyboard {
     }
 
     content += textAreaText;
-    document.querySelector(".textarea").innerText = content;
+    textAreaText = "";
 
+    textarea.value = content;
+    console.log(textarea.value);
+
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var selection = textarea.selection;
+    console.log("selectionStart: " + start 
+          + "\nselectionEnd :" + end
+          + "\nselection: " + selection);
   }
 }

@@ -52,7 +52,7 @@ document.addEventListener("mousedown", (event) => {
   if (event.target.dataset.eventCode === "ShiftLeft") {
     keyboard.shiftLeftPress(event, "active");
   }
-
+  keyboard.displayText(event);
 });
 document.addEventListener("mouseup", (event) => {
   if (event.target.dataset.eventCode === "CapsLock") return;

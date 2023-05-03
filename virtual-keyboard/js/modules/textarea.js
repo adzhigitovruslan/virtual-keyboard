@@ -11,6 +11,8 @@ export class Textarea {
     p.innerText = "You are using keyboard based on mac operating systems \n Use ctrl + alt (⌃ + ⌥) combination to change language";
     const textarea = document.createElement("textarea");
     textarea.classList.add(this.className);
+    textarea.setAttribute("rows", 10);
+    textarea.setAttribute("cols", 30);
     main.prepend(p, textarea);
   }
 }
