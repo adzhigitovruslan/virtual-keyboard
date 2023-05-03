@@ -1,5 +1,6 @@
 import { Keyboard } from "./modules/keyboard.js";
 import { Textarea } from "./modules/textarea.js";
+import { animation } from "./modules/animation.js";
 
 const keyboard = new Keyboard({
   mainClass: "main",
@@ -13,6 +14,7 @@ const textarea = new Textarea({
 keyboard.createKeyboard();
 keyboard.displayKeyboard();
 textarea.displayTextarea();
+animation();
 
 document.addEventListener("keydown", (event) => {
   event.preventDefault();

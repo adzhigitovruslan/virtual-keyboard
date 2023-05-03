@@ -16,10 +16,10 @@ class ButtonOptions {
     button.innerText = this.innerText;
 
     let letter = this.innerText; 
-    if(ruArray.includes(String(letter).toLowerCase()) && !button.dataset.eventCode.includes("Arrow")) {
+    if(ruArray.includes(String(letter).toLowerCase()) && !button.dataset.eventCode.includes("Arrow") && !button.dataset.eventCode.includes("Space")) {
       button.classList.add("ru-letter");
     }
-    if(engArray.includes(String(letter).toLowerCase()) && !button.dataset.eventCode.includes("Arrow")) {
+    if(engArray.includes(String(letter).toLowerCase()) && !button.dataset.eventCode.includes("Arrow") && !button.dataset.eventCode.includes("Space")) {
       button.classList.add("eng-letter");
     }
 

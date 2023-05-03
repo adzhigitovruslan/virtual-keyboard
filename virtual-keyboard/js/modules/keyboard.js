@@ -134,7 +134,6 @@ const eventCodeRu = {
 };
 
 let newValue = "";
-let content = "";
 let switchLang = eventCodeEng;
 
 export class Keyboard {
