@@ -141,8 +141,8 @@ export class Keyboard {
   constructor(options) {
     this.mainClass = options.mainClass;
     this.wrapperClass = options.wrapperClass;
-    this.language = options.language;
-    this.isCapsOn = options.isCapsOn;
+    this.language = localStorage.getItem("language") ? JSON.parse(localStorage.getItem("language")) : true;
+    this.isCapsOn = localStorage.getItem("isCapsOn") ? JSON.parse(localStorage.getItem("isCapsOn")) : false;
   }
 
   createKeyboard() {
@@ -181,10 +181,10 @@ export class Keyboard {
     }
   }
 
-  hangClass(eventCode) {
+  hangClass(event) {
     const allkeys = document.querySelectorAll(".row__key");
     allkeys.forEach((element) => {
-      if (eventCode === element.dataset.eventCode) {
+      if (event.code === element.dataset.eventCode) {
         element.classList.add("active");
       }
     });
@@ -199,44 +199,83 @@ export class Keyboard {
     });
   }
 
-  switchCaps() {
-    this.isCaps = !this.isCaps;
-    localStorage.setItem("capslock", this.isCaps);
-    // this.shiftLeftPress(this.isCaps);
-    // this.shiftLeftUnpress(this.isCaps);
+  switchCaps(value, lang) {
+    this.isCapsOn = !this.isCapsOn;
+    localStorage.setItem("isCapsOn", value);
+    if(value) {
+      this.toUpperCase(lang);
+    } else {
+      this.toLowerCase(lang);
+    }
   }
 
-  shiftLeftPress(eventCode) {
-    if (eventCode === "ShiftLeft" || this.isCaps) {
-      this.toClearScreen();
-      for (let key in switchLang) {
+  shiftLeftPress(event, activeClass) {
+    this.toClearScreen();
+    for (let key in switchLang) {
 
-        if (typeof switchLang[key] === "object") {
+      if (typeof switchLang[key] === "object") {
 
-          const button = new Button({
-            eventCode: key,
-            className: "row__key",
-            innerText: Object.values(switchLang[key]),
-          });
+        const button = new Button({
+          eventCode: key,
+          className: "row__key",
+          activeClass,
+          innerText: Object.values(switchLang[key]),
+        });
 
-          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-        } else if (typeof switchLang[key] !== "object") {
+        document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
+      } else if (typeof switchLang[key] !== "object") {
 
-          const button = new Button({
-            eventCode: key,
-            className: "row__key",
-            innerText: switchLang[key],
-          });
+        const button = new Button({
+          eventCode: key,
+          className: "row__key",
+          activeClass,
+          innerText: switchLang[key],
+        });
 
-          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
+        document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
 
-        }
       }
     }
   }
 
-  shiftLeftUnpress(eventCode) {
-    if (eventCode === "ShiftLeft" || !this.isCaps) {
+  toUpperCase(lang) {
+    if (!lang) {
+      const keys = document.querySelectorAll(".row__key");
+      keys.forEach((el) => {
+        if (el.classList.contains("ru-letter")) {
+          el.innerText = el.innerText.toUpperCase();
+        }
+      });
+    } else {
+      const keys = document.querySelectorAll(".row__key");
+      keys.forEach((el) => {
+        if (el.classList.contains("eng-letter")) {
+          el.innerText = el.innerText.toUpperCase();
+        }
+      });
+    }
+  }
+
+  toLowerCase(lang) {
+    if (!lang) {
+      const keys = document.querySelectorAll(".row__key");
+      keys.forEach((el) => {
+        if (el.classList.contains("ru-letter")) {
+          el.innerText = el.innerText.toLowerCase();
+        }
+      });
+    } else {
+      const keys = document.querySelectorAll(".row__key");
+      keys.forEach((el) => {
+        if (el.classList.contains("eng-letter")) {
+          el.innerText = el.innerText.toLowerCase();
+        }
+      });
+    }
+  }
+
+  shiftLeftUnpress(value) {
+    if (value === "ShiftLeft" || !value) {
 
       this.toClearScreen();
 
@@ -309,64 +348,61 @@ export class Keyboard {
   displayText(event) {
     const keys = document.querySelectorAll(".row__key");
     switch (event.code || event.target.dataset.eventCode) {
-      case "Backspace":
-        textAreaText.slice(0, -1);
-        break;
-      case "Tab":
-        textAreaText = " ";
-        break;
-      case "CapsLock":
-        textAreaText = "";
-        break;
-      case "Enter":
-        textAreaText = "\n";
-        break;
-      case "ShiftLeft":
-        textAreaText = "";
-        break;
-      case "ShiftRight":
-        textAreaText = "";
-        break;
-      case "ControlLeft":
-        if (event.ctrlKey) {
-          console.log("ctrl");
+    case "Backspace":
+      textAreaText.slice(0, -1);
+      break;
+    case "Tab":
+      textAreaText = " ";
+      break;
+    case "CapsLock":
+      textAreaText = "";
+      break;
+    case "Enter":
+      textAreaText = "\n";
+      break;
+    case "ShiftLeft":
+      textAreaText = "";
+      break;
+    case "ShiftRight":
+      textAreaText = "";
+      break;
+    case "ControlLeft":
+      textAreaText = "";
+      break;
+    case "AltLeft":
+      textAreaText = "";
+      break;
+    case "MetaLeft":
+      textAreaText = "";
+      break;
+    case "AltRight":
+      textAreaText = "";
+      break;
+    case "MetaRight":
+      textAreaText = "";
+      break;
+    case "Space":
+      textAreaText = " ";
+      break;
+    case "ArrowLeft":
+      textAreaText = "←";
+      break;
+    case "ArrowRight":
+      textAreaText = "→";
+      break;
+    case "ArrowDown":
+      textAreaText = "↓";
+      break;
+    case "ArrowUp":
+      textAreaText = "↑";
+      break;
+    default:
+      for (let i = 0; i < keys.length; i++) {
+        if (event.code === keys[i].dataset.eventCode || event.target.dataset.eventCode === keys[i].dataset.eventCode) {
+          textAreaText = keys[i].innerText;
         }
-        textAreaText = "";
-        break;
-      case "AltLeft":
-        textAreaText = "";
-        break;
-      case "MetaLeft":
-        textAreaText = "";
-        break;
-      case "AltRight":
-        textAreaText = "";
-        break;
-      case "MetaRight":
-        textAreaText = "";
-        break;
-      case "Space":
-        textAreaText = " ";
-        break;
-      case "ArrowLeft":
-        textAreaText = "←";
-        break;
-      case "ArrowRight":
-        textAreaText = "→";
-        break;
-      case "ArrowDown":
-        textAreaText = "↓";
-        break;
-      case "ArrowUp":
-        textAreaText = "↑";
-        break;
-      default:
-        for (let i = 0; i < keys.length; i++) {
-          if (event.code === keys[i].dataset.eventCode || event.target.dataset.eventCode === keys[i].dataset.eventCode) {
-            textAreaText = keys[i].innerText;
-          }
-        }
-        break;
+      }
+      break;
     }
 
     content += textAreaText;

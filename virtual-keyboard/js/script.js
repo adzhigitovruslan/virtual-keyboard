@@ -1,26 +1,9 @@
 import { Keyboard } from "./modules/keyboard.js";
 import { Textarea } from "./modules/textarea.js";
 
-let language;
-let isCapsOn;
-
-if (localStorage.getItem("language")) {
-  language = JSON.parse(localStorage.getItem("language"));
-} else {
-  localStorage.setItem("language", true);
-}
-
-if (localStorage.getItem("capslock")) {
-  isCapsOn = JSON.parse(localStorage.getItem("capslock"));
-} else {
-  localStorage.setItem("capslock", false);
-}
-
 const keyboard = new Keyboard({
   mainClass: "main",
   wrapperClass: "keyboard",
-  language,
-  isCapsOn,
 });
 
 const textarea = new Textarea({
@@ -33,35 +16,48 @@ textarea.displayTextarea();
 
 document.addEventListener("keydown", (event) => {
   event.preventDefault();
-  keyboard.shiftLeftPress(event.code);
-  keyboard.shortcutPress(event);
-  keyboard.hangClass(event.code);
-  keyboard.displayText(event);
-  if (event.target.dataset.eventCode === "CapsLock") {
-    keyboard.switchCaps();
+  let lang = JSON.parse(localStorage.getItem("language")) || false;
+  if (event.code === "ShiftLeft") {
+    keyboard.shiftLeftPress(event, "active");
   }
+  if (event.getModifierState("CapsLock")) {
+    keyboard.switchCaps(true, lang);
+  } 
+  keyboard.shortcutPress(event);
+  keyboard.hangClass(event);
+  keyboard.displayText(event);
 });
 document.addEventListener("keyup", (event) => {
-  keyboard.shiftLeftUnpress(event.code);
+  if (event.code === "ShiftLeft") {
+    keyboard.shiftLeftUnpress(event.code);
+  }
+  if(!event.getModifierState("CapsLock")) {
+    keyboard.switchCaps(false);
+  }
   keyboard.removeClass(event.code);
-  // if(event.target.dataset.eventCode === "CapsLock") {
-  //   keyboard.switchCaps();
-  // }
 });
 
 document.addEventListener("mousedown", (event) => {
-  keyboard.displayText(event);
-  console.log(event.target.dataset.eventCode);
-  if (event.target.classList.contains("row__key")) {
+  let lang = JSON.parse(localStorage.getItem("language")) || false;
+  if (event.target.dataset.eventCode === "CapsLock" && event.target.classList.contains("active")) {
+    event.target.classList.remove("active");
+    keyboard.switchCaps(false, lang);
+  } else if (event.target.dataset.eventCode === "CapsLock" && !event.target.classList.contains("active")) {
+    keyboard.switchCaps(true, lang);
+    event.target.classList.add("active");
+  } else {
     event.target.classList.add("active");
   }
 
-  keyboard.shiftLeftPress(event.target.dataset.eventCode);
-});
-document.addEventListener("mouseup", (event) => {
-  if (event.target.classList.contains("row__key")) {
-    event.target.classList.remove("active");
+  if (event.target.dataset.eventCode === "ShiftLeft") {
+    keyboard.shiftLeftPress(event, "active");
   }
 
-  keyboard.shiftLeftUnpress(event.target.dataset.eventCode);
+});
+document.addEventListener("mouseup", (event) => {
+  if (event.target.dataset.eventCode === "CapsLock") return;
+  event.target.classList.remove("active");
+  if (event.target.dataset.eventCode === "ShiftLeft") {
+    keyboard.shiftLeftUnpress(event.target.dataset.eventCode);
+  }
 });
