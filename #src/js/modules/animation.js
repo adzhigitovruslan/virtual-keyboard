@@ -1,24 +1,19 @@
 export function animation() {
   const keyboard = document.querySelector(".keyboard");
   const rotation = { x: 20, y: 0 };
-  // const empty = document.querySelector('.empty');
-  // empty.style.color = 'white';
   let animating = [];
-  let animatingColor;
   const keysDown = new Set();
   const keyCodeOfEl = new Map();
   const allKeys = [...document.querySelectorAll(".row__key")];
   allKeys.forEach(el => {
     el.dataset.eventCode && keyCodeOfEl.set(el.dataset.eventCode, el);
   });
-  console.log(allKeys);
 
   const capsLockKeyIndex = allKeys.indexOf(keyCodeOfEl.get("CapsLock"));
 
   const arrowKeyIndexes = ["Up", "Left", "Down", "Right"].map(n => allKeys.indexOf(keyCodeOfEl.get(`Arrow${n}`)));
 
   const macroKeys = [...document.querySelectorAll("[data-macro]")];
-
 
   const furthestKeys = {};
   requestAnimationFrame(() => {
@@ -69,7 +64,6 @@ export function animation() {
 
   function setKeyState(code, state) {
     const el = keyCodeOfEl.get(code);
-    console.log(el, code);
     if (el) {
       if (state) {
         keysDown.add(allKeys.indexOf(el));
@@ -92,7 +86,7 @@ export function animation() {
     }
   }
 
-  window.addEventListener("keydown", e => {
+  document.addEventListener("keydown", e => {
     if (e.code.startsWith("F") && !isNaN(e.code.slice(1))) {
       return;
     }
@@ -101,21 +95,14 @@ export function animation() {
     if (e.code === "CapsLock") {
       return;
     }
-    // if(animating.length) return;
-    // empty.textContent = e.code;
-    // const ele = document.querySelector(`[data-code=${e.code}]`);
     setKeyState(e.code, true);
-    console.log(e.code);
   });
-  window.addEventListener("keyup", e => {
+  document.addEventListener("keyup", e => {
     e.preventDefault();
     setKeyState("CapsLock", e.getModifierState("CapsLock"));
     if (e.code === "CapsLock") {
       return;
     }
-    // if(animating.length) return;
-    // empty.textContent = e.code;
-    // const ele = document.querySelector(`[data-code=${e.code}]`);
     setKeyState(e.code, false);
   });
 
