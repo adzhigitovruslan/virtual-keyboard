@@ -3,13 +3,25 @@ class ButtonOptions {
     this.className = options.className;
     this.eventCode = options.eventCode;
     this.innerText = options.innerText;
+    this.activeClass = options.activeClass;
   }
 
   makeButtons() {
+    const ruArray = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+    const engArray = "abcdefghijklmnopqrstuvwxyz";
+
     const button = document.createElement("button");
     button.classList.add(this.className);
     button.dataset.eventCode = this.eventCode;
     button.innerText = this.innerText;
+
+    let letter = this.innerText; 
+    if(ruArray.includes(String(letter).toLowerCase()) && !button.dataset.eventCode.includes("Arrow")) {
+      button.classList.add("ru-letter");
+    }
+    if(engArray.includes(String(letter).toLowerCase()) && !button.dataset.eventCode.includes("Arrow")) {
+      button.classList.add("eng-letter");
+    }
 
     switch (this.eventCode) {
     case "Escape":
@@ -30,7 +42,7 @@ class ButtonOptions {
       button.dataset.macro = "green:Enter";
       break;
     case "ShiftLeft":
-      button.classList.add("yellow", "size-4", "stretch");
+      button.classList.add("yellow", "size-4", "stretch", this.activeClass);
       button.dataset.macro = "yellow:ShiftLeft";
       break;
     case "ShiftRight":
@@ -44,6 +56,10 @@ class ButtonOptions {
     case "MetaLeft":
       button.classList.add("purple", "size-1");
       button.dataset.macro = "purple:MetaLeft";
+      break;
+    case "MetaRight":
+      button.classList.add("green", "size-1");
+      button.dataset.macro = "purple:MetaRight";
       break;
     case "ArrowUp":
       button.innerHTML = "<i class=\"icon-navigation-arrow arrow-up\"></i>";

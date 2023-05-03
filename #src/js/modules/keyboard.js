@@ -133,7 +133,7 @@ const eventCodeRu = {
   "ArrowRight": "",
 };
 
-let textAreaText = "";
+let newValue = "";
 let content = "";
 let switchLang = eventCodeEng;
 
@@ -141,7 +141,8 @@ export class Keyboard {
   constructor(options) {
     this.mainClass = options.mainClass;
     this.wrapperClass = options.wrapperClass;
-    this.language = options.language;
+    this.language = localStorage.getItem("language") ? JSON.parse(localStorage.getItem("language")) : true;
+    this.isCapsOn = localStorage.getItem("isCapsOn") ? JSON.parse(localStorage.getItem("isCapsOn")) : false;
   }
 
   createKeyboard() {
@@ -180,10 +181,10 @@ export class Keyboard {
     }
   }
 
-  hangClass(eventCode) {
+  hangClass(event) {
     const allkeys = document.querySelectorAll(".row__key");
     allkeys.forEach((element) => {
-      if (eventCode === element.dataset.eventCode) {
+      if (event.code === element.dataset.eventCode) {
         element.classList.add("active");
       }
     });
@@ -198,61 +199,100 @@ export class Keyboard {
     });
   }
 
-  shiftLeftPress(eventCode) {
-    if (eventCode === "ShiftLeft") {
-      this.toClearScreen();
-      for (let key in switchLang) {
+  switchCaps(value) {
+    let lang = JSON.parse(localStorage.getItem("language")) || false;
+    this.isCapsOn = !this.isCapsOn;
+    localStorage.setItem("isCapsOn", value);
+    if (value) {
+      this.toUpperCase(lang);
+    } else {
+      this.toLowerCase(lang);
+    }
+  }
 
-        if (typeof switchLang[key] === "object") {
+  shiftLeftPress() {
+    let lang = JSON.parse(localStorage.getItem("language")) || false;
+    this.toUpperCase(lang);
+    let obj = lang ? eventCodeEng : eventCodeRu;
 
-          const button = new Button({
-            eventCode: key,
-            className: "row__key",
-            innerText: Object.values(switchLang[key]),
-          });
-
-          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-        } else if (typeof switchLang[key] !== "object") {
-
-          const button = new Button({
-            eventCode: key,
-            className: "row__key",
-            innerText: switchLang[key],
-          });
-
-          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-
+    const keys = document.querySelectorAll(".row__key");
+    for (let key in obj) {
+      if (lang) {
+        if (key.includes("Key")) continue;
+        for (let i = 0; i < keys.length; i++) {
+          if (keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+            keys[i].innerText = Object.values(obj[key]);
+          }
+        }
+      } else {
+        if (key.includes("Key")) continue;
+        for (let i = 0; i < keys.length; i++) {
+          if (keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+            keys[i].innerText = Object.values(obj[key]);
+          }
         }
       }
     }
   }
 
-  shiftLeftUnpress(eventCode) {
-    if (eventCode === "ShiftLeft") {
+  shiftLeftUnpress() {
+    let lang = JSON.parse(localStorage.getItem("language")) || false;
+    this.toLowerCase(lang);
+    let obj = lang ? eventCodeEng : eventCodeRu;
 
-      this.toClearScreen();
-
-      for (let key in switchLang) {
-
-        if (typeof switchLang[key] === "object") {
-          const button = new Button({
-            eventCode: key,
-            className: "row__key",
-            innerText: Object.keys(switchLang[key]),
-          });
-          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
-
-        } else if (typeof switchLang[key] !== "object") {
-
-          const button = new Button({
-            eventCode: key,
-            className: "row__key",
-            innerText: switchLang[key],
-          });
-
-          document.querySelector(`.${this.wrapperClass}`).append(button.makeButtons());
+    const keys = document.querySelectorAll(".row__key");
+    for (let key in obj) {
+      if (lang) {
+        if (key.includes("Key")) continue;
+        for (let i = 0; i < keys.length; i++) {
+          if (keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+            keys[i].innerText = Object.keys(obj[key]);
+          }
+        }
+      } else {
+        if (key.includes("Key")) continue;
+        for (let i = 0; i < keys.length; i++) {
+          if (keys[i].dataset.eventCode === key && typeof obj[key] === "object") {
+            keys[i].innerText = Object.keys(obj[key]);
+          }
         }
       }
+    }
+  }
+
+  toUpperCase(lang) {
+    if (!lang) {
+      const keys = document.querySelectorAll(".row__key");
+      keys.forEach((el) => {
+        if (el.classList.contains("ru-letter")) {
+          el.innerText = el.innerText.toUpperCase();
+        }
+      });
+    } else {
+      const keys = document.querySelectorAll(".row__key");
+      keys.forEach((el) => {
+        if (el.classList.contains("eng-letter")) {
+          el.innerText = el.innerText.toUpperCase();
+        }
+      });
+    }
+  }
+
+  toLowerCase(lang) {
+    if (!lang) {
+      const keys = document.querySelectorAll(".row__key");
+      keys.forEach((el) => {
+        if (el.classList.contains("ru-letter")) {
+          el.innerText = el.innerText.toLowerCase();
+        }
+      });
+    } else {
+      const keys = document.querySelectorAll(".row__key");
+      keys.forEach((el) => {
+        if (el.classList.contains("eng-letter")) {
+          el.innerText = el.innerText.toLowerCase();
+        }
+      });
     }
   }
 
@@ -273,60 +313,114 @@ export class Keyboard {
     this.displayKeyboard(this.language);
   }
 
-
   displayText(event) {
     const keys = document.querySelectorAll(".row__key");
+    const textarea = document.querySelector(".textarea");
 
-    switch (event.code) {
+    switch (event.code || event.target.dataset.eventCode) {
     case "Backspace":
-      textAreaText.slice(0, -1);
+      newValue = "";
+      this.toBackspace(textarea);
       break;
     case "Tab":
-      textAreaText = "";
+      newValue = " ";
       break;
     case "CapsLock":
-      textAreaText = "";
+      newValue = "";
       break;
     case "Enter":
-      textAreaText = "\n";
+      newValue = "\n";
       break;
     case "ShiftLeft":
-      textAreaText = "";
+      newValue = "";
       break;
     case "ShiftRight":
-      textAreaText = "";
+      newValue = "";
       break;
     case "ControlLeft":
-      if(event.ctrlKey) {
-        console.log("ctrl");
-      }
-      textAreaText = "";
+      newValue = "";
       break;
     case "AltLeft":
-      textAreaText = "";
+      newValue = "";
       break;
     case "MetaLeft":
-      textAreaText = "";
+      newValue = "";
       break;
     case "AltRight":
-      textAreaText = "";
+      newValue = "";
       break;
     case "MetaRight":
-      textAreaText = "";
+      newValue = "";
       break;
     case "Space":
-      textAreaText = " ";
+      newValue = " ";
+      break;
+    case "Delete":
+      this.toDel(textarea);
+      newValue = "";
+      break;
+    case "ArrowLeft":
+      newValue = "←";
+      break;
+    case "ArrowRight":
+      newValue = "→";
+      break;
+    case "ArrowDown":
+      newValue = "↓";
+      break;
+    case "ArrowUp":
+      newValue = "↑";
       break;
     default:
       for (let i = 0; i < keys.length; i++) {
-        if (event.code === keys[i].dataset.eventCode) {
-          textAreaText = keys[i].innerText;
+        if (event.code === keys[i].dataset.eventCode || event.target.dataset.eventCode === keys[i].dataset.eventCode) {
+          newValue = keys[i].innerText;
         }
       }
       break;
     }
+    this.insertNewText(textarea, newValue);
+    newValue = "";
+  }
 
-    content += textAreaText;
-    document.querySelector(".textarea").innerText = content;
+  insertNewText(textarea, newValue) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const after = text.substring(end, text.length);
+    textarea.value = (before + newValue + after);
+    textarea.selectionStart = textarea.selectionEnd = start + newValue.length;
+    textarea.focus();
+  }
+
+  toBackspace(textarea) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const before = text.substring(0, start - 1);
+    const after = text.substring(end, text.length);
+
+    if (start === 0 && start === end) return;
+    if (start !== 0) {
+      textarea.value = before + after;
+      textarea.selectionStart = textarea.selectionEnd = start - 1;
+      textarea.focus();
+    }
+  }
+
+  toDel(textarea) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const after = text.substring(end + 1, text.length);
+
+    if (start === text.length && start === end) return;
+    if (start !== text.length) {
+      textarea.value = before + after;
+      textarea.selectionStart = textarea.selectionEnd = start;
+      textarea.focus();
+    }
   }
 }
